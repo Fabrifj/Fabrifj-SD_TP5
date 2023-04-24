@@ -1,0 +1,18 @@
+{
+  "name": "slave",
+  "version": "1.0.0",
+  "description": "nodejs server",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "author": "DKM",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.3.5",
+    "dockerode": "^3.3.5",
+    "express": "^4.18.2",
+    "mqtt": "^4.3.7"
+  }
+}

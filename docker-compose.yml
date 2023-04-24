@@ -1,0 +1,22 @@
+version: '3.8'
+services:
+  broker_mqtt:
+    image: eclipse-mosquitto:latest
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
+  master:
+    image: tp4-master
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      restart_policy:
+        condition: on-failure
+  slave:
+    image: tp4-slave
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
