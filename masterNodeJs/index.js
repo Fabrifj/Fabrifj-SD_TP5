@@ -1,5 +1,16 @@
 const mqtt = require('mqtt');
 const client = mqtt.connect('mqtt://broker_mqtt:1883');
+const express = require('express');
+const app = express();
+const port = 5000;
+
+app.get('/', (req, res) => {
+  res.send('Hello, this is the Master service!');
+});
+
+app.listen(port, '0.0.0.0', () => {
+  console.log(`Master service listening at http://0.0.0.0:${port}`);
+});
 
 let slaves = [];
 

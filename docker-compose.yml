@@ -6,16 +6,22 @@ services:
       - "1883:1883"
     volumes:
       - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
+
   master:
     image: tp4-master
+    depends_on:
+      - broker_mqtt
     deploy:
       replicas: 1
       placement:
         constraints: [node.role == manager]
       restart_policy:
         condition: on-failure
+
   slave:
     image: tp4-slave
+    depends_on:
+      - master
     deploy:
       replicas: 2
       restart_policy:
