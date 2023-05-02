@@ -1,13 +1,21 @@
+// Imports
 const mqtt = require('mqtt');
 const os = require('os');
-const client = mqtt.connect('mqtt://broker_mqtt:1883');
+const clientmqtt = mqtt.connect('mqtt://broker_mqtt:1883');
 
-// observar
 const slave_id = os.hostname(); 
 const ip = '172.2.0.2'; 
 
-client.on('connect', () => {
-  client.subscribe('work');
+const grpc = require('grpc');
+const protoLoader = require('@grpc/proto-loader');
+const master_slave_proto = grpc.loadPackageDefinition(protoLoader.loadSync('./master_slave.proto')).master_slave;
+
+const clientgrpc = new master_slave_proto.MasterSlaveService('localhost:50051', grpc.credentials.createInsecure());
+
+
+// mqtp
+clientmqtt.on('connect', () => {
+  clientmqtt.subscribe('work');
 
   const registerMessage = {
     slave_id: slave_id,
@@ -15,11 +23,17 @@ client.on('connect', () => {
     timestamp: new Date().toISOString(),
   };
 
-  client.publish('register', JSON.stringify(registerMessage));
-  console.log('Registrado como Slave:', registerMessage);
+  // Registra el Slave en el Master
+  clientgrpc.RegisterSlave(registerMessage, (error, response) => {
+    if (error) {
+      console.error('Error al registrar el Slave:', error);
+    } else {
+      console.log('Registro exitoso:', response.message);
+    }
+  });
 });
 
-client.on('message', (topic, message) => {
+clientmqtt.on('message', (topic, message) => {
   const msg = JSON.parse(message.toString());
 
   if (topic === 'work' && msg.slaveid === slave_id) {
@@ -32,8 +46,14 @@ client.on('message', (topic, message) => {
         timestamp: new Date().toISOString(),
       };
 
-      client.publish('results', JSON.stringify(resultsMessage));
-      console.log('Resultado enviado al Master:', resultsMessage);
+      // Envía un resultado al Master
+      client.SendResult(resultsMessage, (error, response) => {
+        if (error) {
+          console.error('Error al enviar el resultado:', error);
+        } else {
+          console.log('Resultado recibido:', response.message);
+        }
+      });
     }, randomDelay * 1000);
   }
 });
