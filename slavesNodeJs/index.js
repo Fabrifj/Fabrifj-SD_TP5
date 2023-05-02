@@ -6,11 +6,11 @@ const clientmqtt = mqtt.connect('mqtt://broker_mqtt:1883');
 const slave_id = os.hostname(); 
 const ip = '172.2.0.2'; 
 
-const grpc = require('grpc');
+const grpc = require('@grpc/grpc-js');
 const protoLoader = require('@grpc/proto-loader');
 const master_slave_proto = grpc.loadPackageDefinition(protoLoader.loadSync('./master_slave.proto')).master_slave;
 
-const clientgrpc = new master_slave_proto.MasterSlaveService('localhost:50051', grpc.credentials.createInsecure());
+const clientgrpc = new master_slave_proto.MasterSlaveService('master:50051', grpc.credentials.createInsecure());
 
 
 // mqtp
@@ -47,7 +47,7 @@ clientmqtt.on('message', (topic, message) => {
       };
 
       // Envía un resultado al Master
-      client.SendResult(resultsMessage, (error, response) => {
+      clientgrpc.SendResult(resultsMessage, (error, response) => {
         if (error) {
           console.error('Error al enviar el resultado:', error);
         } else {

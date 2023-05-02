@@ -6,6 +6,7 @@ const express = require('express');
 const app = express();
 const port = 5000;
 
+const grpc = require('@grpc/grpc-js');
 const protoLoader = require('@grpc/proto-loader');
 const master_slave_proto = grpc.loadPackageDefinition(protoLoader.loadSync('./master_slave.proto')).master_slave;
 const server = new grpc.Server();

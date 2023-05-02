@@ -2,6 +2,7 @@ FROM node:latest
 COPY ./package*.json /app/masterNodeJs/
 COPY ./index.js /app/masterNodeJs/
 COPY ./wait-for /app/masterNodeJs/
+COPY ./master_slave.proto /app/masterNodeJs/
 WORKDIR /app/masterNodeJs
 RUN npm install
 RUN chmod +x ./wait-for
