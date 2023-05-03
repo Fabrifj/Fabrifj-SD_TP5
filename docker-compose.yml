@@ -22,7 +22,7 @@ services:
 
 
   slave:
-    image: 172.18.48.1:5000/tp4-slave
+    image: 172.18.48.1:5000/tp5-slave-py
     depends_on:
       - master
     deploy:

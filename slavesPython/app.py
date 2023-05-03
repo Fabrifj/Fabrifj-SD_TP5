@@ -18,7 +18,7 @@ clientmqtt = mqtt.Client()
 def on_connect(client, userdata, flags, rc):
     client.subscribe("work")
 
-    register_message = master_slave_pb2.RegisterSlaveRequest(slave_id=slave_id, ip=ip, timestamp=Timestamp().GetCurrentTime())
+    register_message = master_slave_pb2.RegisterSlave(slave_id=slave_id, ip=ip, timestamp=Timestamp().GetCurrentTime())
 
     try:
         response = clientgrpc.RegisterSlave(register_message)
