@@ -23,6 +23,8 @@ clientmqtt.on('connect', () => {
     timestamp: new Date().toISOString(),
   };
 
+  console.log('Mensaje de registro del Slave:', registerMessage); // Agrega esta línea
+
   // Registra el Slave en el Master
   clientgrpc.RegisterSlave(registerMessage, (error, response) => {
     if (error) {
@@ -42,18 +44,20 @@ clientmqtt.on('message', (topic, message) => {
     setTimeout(() => {
       const resultsMessage = {
         slave_id: slave_id,
-        duration: randomDelay,
-        timestamp: new Date().toISOString(),
-      };
+        data: JSON.stringify({
+          duration: randomDelay,
+          timestamp: new Date().toISOString(),
+    }),
+  };
 
-      // Envía un resultado al Master
-      clientgrpc.SendResult(resultsMessage, (error, response) => {
-        if (error) {
-          console.error('Error al enviar el resultado:', error);
-        } else {
-          console.log('Resultado recibido:', response.message);
-        }
-      });
-    }, randomDelay * 1000);
+  // Envía un resultado al Master
+    clientgrpc.SendResult(resultsMessage, (error, response) => {
+      if (error) {
+        console.error('Error al enviar el resultado:', error);
+      } else {
+        console.log('Resultado recibido:', response.message);
+      }
+    });
+  }, randomDelay * 1000);
   }
 });

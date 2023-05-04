@@ -8,16 +8,20 @@ echo "Iniciando creación de las imágenes"
 docker build -t "tp5-master" ./masterNodeJs
 docker build -t "tp5-slave-nj" ./slavesNodeJs
 docker build -t "tp5-slave-py" ./slavesPython
+docker build -t "tp5-slave-go" ./slavesGo
 
 
 echo "Crear y etiquetar imágenes"
-docker tag tp5-master 172.18.48.1:5000/tp5-master
-docker push 172.18.48.1:5000/tp5-master
+docker tag tp5-master 10.1.2.112:5000/tp5-master
 
-docker tag tp5-slave-nj 172.18.48.1:5000/tp5-slave-nj
-docker push 172.18.48.1:5000/tp5-slave-nj
+docker tag tp5-slave-nj 10.1.2.112:5000/tp5-slave-nj
+docker push 10.1.2.112:5000/tp5-slave-nj
 
-docker tag tp5-slave-py 172.18.48.1:5000/tp5-slave-py
-docker push 172.18.48.1:5000/tp5-slave-py
+docker tag tp5-slave-py 10.1.2.112:5000/tp5-slave-py
+docker push 10.1.2.112:5000/tp5-slave-py
+
+docker tag tp5-slave-go 10.1.2.112:5000/tp5-slave-go
+docker push 10.1.2.112:5000/tp5-slave-go
+
 echo "Levantar servicios master y slave"
 docker stack deploy -c docker-compose.yml master_slave

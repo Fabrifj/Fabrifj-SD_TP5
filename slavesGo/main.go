@@ -2,18 +2,15 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
-	"math/rand"
 	"os"
-	"strconv"
 	"time"
 
-	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc"
 	pb "path/to/your/generated/grpc/package"
+	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
+
 
 func main() {
 	// gRPC client
@@ -23,9 +20,9 @@ func main() {
 	}
 	defer conn.Close()
 
-	grpcClient := pb.NewMasterSlaveServiceClient(conn)
+	grpcClient := pb.MasterSlaveService(conn)
 
-	// MQTT client
+	// MQTT client 
 	mqttOpts := mqtt.NewClientOptions()
 	mqttOpts.AddBroker("tcp://broker_mqtt:1883")
 	mqttClient := mqtt.NewClient(mqttOpts)
@@ -36,10 +33,11 @@ func main() {
 	}
 	defer mqttClient.Disconnect(250)
 
+
 	slaveID := os.Getenv("HOSTNAME")
 	ip := "172.2.0.2"
 
-	registerMessage := &pb.RegisterSlaveRequest{
+	registerMessage := &pb.SlaveInfo{
 		SlaveId:   slaveID,
 		Ip:        ip,
 		Timestamp: time.Now().Format(time.RFC3339),
@@ -66,10 +64,8 @@ func main() {
 			randomDelay := time.Duration(rand.Intn(10)+1) * time.Second
 			time.Sleep(randomDelay)
 
-			sendResultMessage := &pb.SendResultRequest{
+			sendResultMessage := &pb.Result{
 				SlaveId:   slaveID,
-				Duration:  int32(randomDelay.Seconds()),
-				Timestamp: time.Now().Format(time.RFC3339),
 			}
 
 			// Envía un resultado al Master

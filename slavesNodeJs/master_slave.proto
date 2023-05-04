@@ -8,9 +8,9 @@ service MasterSlaveService {
 }
 
 message SlaveInfo {
-  string id = 1;
-  string ip_address = 2;
-  int32 port = 3;
+  string slave_id = 1;
+  string ip = 2;
+  string timestamp = 3;
 }
 
 message RegistrationResponse {

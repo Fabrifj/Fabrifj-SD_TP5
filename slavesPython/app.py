@@ -1,11 +1,11 @@
 import paho.mqtt.client as mqtt
 import socket
 import time
+import random
 import grpc
 import master_slave_pb2
 import master_slave_pb2_grpc
 from google.protobuf.timestamp_pb2 import Timestamp
-from datetime import datetime
 
 slave_id = socket.gethostname()
 ip = '172.2.0.2'
@@ -18,7 +18,9 @@ clientmqtt = mqtt.Client()
 def on_connect(client, userdata, flags, rc):
     client.subscribe("work")
 
-    register_message = master_slave_pb2.RegisterSlave(slave_id=slave_id, ip=ip, timestamp=Timestamp().GetCurrentTime())
+    current_time = Timestamp()
+    current_time.GetCurrentTime()
+    register_message = master_slave_pb2.RegisterSlaveRequest(slave_id=slave_id, ip=ip, timestamp=current_time)
 
     try:
         response = clientgrpc.RegisterSlave(register_message)
@@ -30,18 +32,27 @@ def on_message(client, userdata, msg):
     payload = msg.payload.decode("utf-8")
     topic = msg.topic
 
-    if topic == "work" and payload == slave_id:
-        random_delay = random.randint(1, 10)
+    if topic == "work":
+        msg_data = master_slave_pb2.WorkMessage()
+        msg_data.ParseFromString(msg.payload)
 
-        time.sleep(random_delay)
+        if msg_data.slave_id == slave_id:
+            random_delay = random.randint(1, 10)
 
-        results_message = master_slave_pb2.SendResultRequest(slave_id=slave_id, duration=random_delay, timestamp=Timestamp().GetCurrentTime())
+            time.sleep(random_delay)
 
-        try:
-            response = clientgrpc.SendResult(results_message)
-            print(f"Resultado recibido: {response.message}")
-        except grpc.RpcError as error:
-            print(f"Error al enviar el resultado: {error}")
+            current_time = Timestamp()
+            current_time.GetCurrentTime()
+            results_message = master_slave_pb2.SendResultRequest(slave_id=slave_id, data=str({
+                'duration': random_delay,
+                'timestamp': current_time.ToJsonString(),
+            }))
+
+            try:
+                response = clientgrpc.SendResult(results_message)
+                print(f"Resultado recibido: {response.message}")
+            except grpc.RpcError as error:
+                print(f"Error al enviar el resultado: {error}")
 
 clientmqtt.on_connect = on_connect
 clientmqtt.on_message = on_message

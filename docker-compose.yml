@@ -10,7 +10,7 @@ services:
 
 
   master:
-    image: 172.18.48.1:5000/tp4-master
+    image: 10.1.2.112:5000/tp5-master
     depends_on:
       - broker_mqtt
     deploy:
@@ -21,13 +21,38 @@ services:
         condition: on-failure
 
 
-  slave:
-    image: 172.18.48.1:5000/tp5-slave-py
+  slave-nj:
+    image: 10.1.2.112:5000/tp5-slave-nj
     depends_on:
       - master
     deploy:
       replicas: 2
+      placement:
+        constraints: [node.role == worker]
       restart_policy:
         condition: on-failure
+
+  slave-py:
+    image: 10.1.2.112:5000/tp5-slave-py
+    depends_on:
+      - master
+    deploy:
+      replicas: 2
+      placement:
+        constraints: [node.role == worker]
+      restart_policy:
+        condition: on-failure
+
+  slave-go:
+    image: 10.1.2.112:5000/tp5-slave-go
+    depends_on:
+      - master
+    deploy:
+      replicas: 2
+      placement:
+        constraints: [node.role == worker]
+      restart_policy:
+        condition: on-failure
+
 
 
