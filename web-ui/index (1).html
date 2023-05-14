@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Enviar archivos</title>
+</head>
+<body>
+  <h1>Enviar archivos</h1>
+  <input type="file" id="fileInput1">
+  <input type="file" id="fileInput2">
+  <button onclick="sendFiles()">Enviar</button>
+  <img id="gifImage" alt="GIF animado">
+
+  <script>
+    const socket = new WebSocket('ws://research.upb.edu:31183');
+
+    socket.onopen = () => {
+      console.log('Conexión WebSocket establecida.');
+    };
+
+    function sendFiles() {
+      const fileInput1 = document.getElementById('fileInput1');
+      const fileInput2 = document.getElementById('fileInput2');
+      const file1 = fileInput1.files[0];
+      const file2 = fileInput2.files[0];
+
+      // Crear objetos de tipo FileReader para leer los archivos
+      const reader1 = new FileReader();
+      reader1.onload = () => {
+        const fileData1 = {
+          name: file1.name,
+          data: Array.from(new Uint8Array(reader1.result))
+        };
+        socket.send(JSON.stringify(fileData1));
+      };
+      reader1.readAsArrayBuffer(file1);
+
+      const reader2 = new FileReader();
+      reader2.onload = () => {
+        const fileData2 = {
+          name: file2.name,
+          data: Array.from(new Uint8Array(reader2.result))
+        };
+        socket.send(JSON.stringify(fileData2));
+      };
+      reader2.readAsArrayBuffer(file2);
+    }
+
+    socket.onmessage = (event) => {
+        const fileContent = event.data;
+
+        const image = document.getElementById('gifImage') //new Image();
+        image.src = URL.createObjectURL(new Blob([fileContent], { type: 'image/gif' }));
+
+        image.onload = () => {
+            const canvas = document.getElementById('canvas');
+            const context = canvas.getContext('2d');
+
+            canvas.width = image.width;
+            canvas.height = image.height;
+
+            context.drawImage(image, 0, 0);
+        };
+    };
+  </script>
+</body>
+</html>
