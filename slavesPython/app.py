@@ -21,7 +21,6 @@ def on_connect(client, userdata, flags, rc):
     current_time = Timestamp()
     current_time.GetCurrentTime()
     register_message = master_slave_pb2.RegisterSlaveRequest(slave_id=slave_id, ip=ip, timestamp=current_time)
-
     try:
         response = clientgrpc.RegisterSlave(register_message)
         print(f"Registro exitoso: {response.message}")

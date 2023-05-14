@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.0'
 
 services:
   broker_mqtt:
@@ -10,49 +10,14 @@ services:
 
 
   master:
-    image: 10.1.2.112:5000/tp5-master
+    build: 
+      context: ./masterNodeJs
+      dockerfile: Dockerfile
     depends_on:
       - broker_mqtt
-    deploy:
-      replicas: 1
-      placement:
-        constraints: [node.role == manager]
-      restart_policy:
-        condition: on-failure
-
-
-  slave-nj:
-    image: 10.1.2.112:5000/tp5-slave-nj
+  slave-js:
+    build: 
+      context: ./slavesNodeJs
+      dockerfile: Dockerfile
     depends_on:
       - master
-    deploy:
-      replicas: 2
-      placement:
-        constraints: [node.role == worker]
-      restart_policy:
-        condition: on-failure
-
-  slave-py:
-    image: 10.1.2.112:5000/tp5-slave-py
-    depends_on:
-      - master
-    deploy:
-      replicas: 2
-      placement:
-        constraints: [node.role == worker]
-      restart_policy:
-        condition: on-failure
-
-  slave-go:
-    image: 10.1.2.112:5000/tp5-slave-go
-    depends_on:
-      - master
-    deploy:
-      replicas: 2
-      placement:
-        constraints: [node.role == worker]
-      restart_policy:
-        condition: on-failure
-
-
-

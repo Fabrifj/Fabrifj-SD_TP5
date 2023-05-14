@@ -38,6 +38,8 @@ bower_components
 build/Release
 
 # Dependency directories
+**/masterNodeJs/master/node_modules/
+**/slavesNodeJs/slave/node_modules/
 node_modules/
 jspm_packages/
 gRPC/

@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package master_slave;
+
+service MasterSlaveService {
+  rpc SendIni (SlaveInfo) returns (IniFile);
+  rpc RegisterSlave (SlaveInfo) returns (RegistrationResponse);
+  rpc SendImage (ImageBinaryRequest) returns (Acknowledgement);
+  
+}
+
+message SlaveInfo {
+  string ip = 2;
+}
+
+message RegistrationResponse {
+  string message = 1;
+}
+
+message Acknowledgement {
+  string message = 1;
+}
+
+message ImageBinaryRequest {
+  bytes image = 1;
+  int32 ininum = 2;
+   int32 runid = 3;
+}
+message IniFileRequest {
+  string slave_ip = 1;
+}
+
+message IniFile {
+  bytes inifile = 1;
+  int32 runid = 2;
+  int32 ininum = 3;
+}
